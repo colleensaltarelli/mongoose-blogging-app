@@ -1,2 +1,9 @@
 language: node_js
 node_js: node
+deploy:
+  provider: heroku
+  api_key:
+    secure: eMw5+1IaULo6FWkFSX0imRFj4sXrwRO5gQynImvAB1rD9qLkrsWHOPebKxGr8Lx/yu4Xwauqk084qoIWxisFpYWLL4X3NBJDZxu8pP/Fo7k9cG94+qkxdWb7+gxLVeWqMuLVB1si0xpbIhKY3bmRxpulNr6HjeKKR1rQCxmgrLrXrUfWZVLGuRnGYGyLGCkbr1BnV8oOR5sDctB541EpAoJ9k9N+Kqf6ilAdlnqnfMYUmaY9KW/cnTlhZQ523eGvR+mCgwRoQU9rE1NnPkn8dt9nLqvacxP9IhuyMOCKhPti/kp0Aah5Dxz+jy3i93cCc40LC3C8JGCewN9LOuPkuRwogEQLphHTQn4G96LfoQnT0Mj0+wNzQVs5LwSsFx4/c7Cjmrvlf1dqxKNTym2o+FhXGvVK7GM1zzpAfX6/L6RgxUYVNMH5RiSCOQli6CF1uGfGIPIrFbqBocB6lSwWQEgtOOGJ/hQINkl1e+H/9v15oyk42HLGnEwEL0apUNNHyzrlhnz41fX+QNhwClT1qlkIsGmAS7CLRDorXN3SrxQIiZRVHHbdJXHwdvDVV7FGR/iNn6O9/xBghn5qavuu+UfUIRrF+nXNn2gjasl4ma9hqyTI9RSjBWFJNVo8jYFZP9mLGNeEjb1H/+HICYwYvfON/bj0w7YrzW2jd72iA/0=
+  app: stark-sands-61288
+  on:
+    repo: colleensaltarelli/mongoose-blogging-app
