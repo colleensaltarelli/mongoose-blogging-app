@@ -18,7 +18,7 @@ blogPostSchema.methods.apiRepr = function() {
   return {
     id: this._id,
     title: this.title,
-    author: this.author.firstName + this.author.lastName,
+    author: this.author.firstName + " " + this.author.lastName,
     content: this.content,
   };
 }
