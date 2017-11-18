@@ -9,14 +9,14 @@ mongoose.Promise = global.Promise;
 // config.js is where we control constants for entire
 // app like PORT and DATABASE_URL
 const {PORT, DATABASE_URL} = require('./config');
-const {BlogPosts} = require('./models');
+const {BlogPost} = require('./models');
 
 const app = express();
 app.use(bodyParser.json());
 
 // GET requests to /posts => sends back all posts in the database
 app.get('/posts', (req, res) => {
-    BlogPosts.find()
+    BlogPost.find()
     // success callback: for each post we got back, we'll
     // call the `.apiRepr` instance method we've created in
     // models.js in order to only expose the data we want the API return.
@@ -34,7 +34,7 @@ app.get('/posts', (req, res) => {
 
 // request a single post by ID
 app.get('/posts/:id', (req, res) => {
-    BlogPosts
+    BlogPost
     // this is a convenience method Mongoose provides for searching
     // by the object _id property
     .findById(req.params.id)
@@ -60,7 +60,7 @@ app.post('/posts', (req, res) => {
     }
     //return the new post (using the same key/value pairs 
     //as the posts returned by GET /posts)
-    BlogPosts
+    BlogPost
       .create({
         title: req.body.title,
         content: req.body.content,
@@ -99,7 +99,7 @@ app.put('/posts/:id', (req, res) => {
     }
   });
 
-  BlogPosts
+  BlogPost
     // all key/value pairs in toUpdate will be updated -- that's what `$set` does
     .findByIdAndUpdate(req.params.id, {$set: toUpdate})
     .then(blogPost => res.status(200).end())
