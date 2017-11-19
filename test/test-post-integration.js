@@ -7,6 +7,7 @@ const mongoose = require('mongoose');
 // this module
 const should = chai.should();
 
+const {DATABASE_URL} = require('../config');
 const {TEST_DATABASE_URL} = require('../config');
 const {BlogPost} = require('../models');
 const {app, runServer, closeServer} = require('../server');
@@ -80,91 +81,154 @@ describe('Blog Posts API resource', function() {
   // on proving something small
   describe('GET endpoint', function() {
     
-        it('should return all existing blog posts', function() {
-          // strategy:
-          //    1. get back all blog posts returned by by GET request to `/posts`
-          //    2. prove res has right status, data type
-          //    3. prove the number of blog posts we got back is equal to number
-          //       in db.
-          //
-          // need to have access to mutate and access `res` across
-          // `.then()` calls below, so declare it here so can modify in place
-          let res;
-          return chai.request(app)
-            .get('/posts')
-            .then(function(_res) {
-              // so subsequent .then blocks can access resp obj.
-              res = _res;
-              res.should.have.status(200);
-              // otherwise our db seeding didn't work
-              res.body.blogPosts.should.have.length.of.at.least(1);
-              return BlogPost.count();
-            })
-            .then(function(count) {
-              res.body.blogPosts.should.have.length.of(count);
-            });
+    it('should return all existing blog posts', function() {
+        // strategy:
+        //    1. get back all blog posts returned by by GET request to `/posts`
+        //    2. prove res has right status, data type
+        //    3. prove the number of blog posts we got back is equal to number
+        //       in db.
+        //
+        // need to have access to mutate and access `res` across
+        // `.then()` calls below, so declare it here so can modify in place
+        let res;
+        return chai.request(app)
+        .get('/posts')
+        .then(function(_res) {
+            // so subsequent .then blocks can access resp obj.
+            res = _res;
+            res.should.have.status(200);
+            // otherwise our db seeding didn't work
+            res.body.blogPosts.should.have.length.of.at.least(1);
+            return BlogPost.count();
+        })
+        .then(function(count) {
+            res.body.blogPosts.should.have.length.of(count);
         });
-    
-    
-        it('should return blog posts with right fields', function() {
-          // Strategy: Get back all blog posts, and ensure they have expected keys
-    
-          let resBlogPost;
-          return chai.request(app)
-            .get('/posts')
-            .then(function(res) {
-              res.should.be.json;
-              res.body.blogPosts.should.be.a('array');
-              res.body.blogPosts.should.have.length.of.at.least(1);
-    
-              res.body.blogPosts.forEach(function(blogPost) {
-                blogPost.should.be.a('object');
-                blogPost.should.include.keys(
-                  'id', 'title', 'content', 'author');
-              });
-              resBlogPost = res.body.blogPosts[0];
-              return BlogPost.findById(resBlogPost.id);
-            })
-            .then(function(blogPost) {
-    
-              blogPost.id.should.equal(blogPost.id);
-              blogPost.title.should.equal(blogPost.title);
-              blogPost.content.should.equal(blogPost.content);
-              blogPost.author.should.equal(blogPost.author);
+    });
+
+
+    it('should return blog posts with right fields', function() {
+        // Strategy: Get back all blog posts, and ensure they have expected keys
+
+        let resBlogPost;
+        return chai.request(app)
+        .get('/posts')
+        .then(function(res) {
+            res.should.be.json;
+            res.body.blogPosts.should.be.a('array');
+            res.body.blogPosts.should.have.length.of.at.least(1);
+
+            res.body.blogPosts.forEach(function(blogPost) {
+            blogPost.should.be.a('object');
+            blogPost.should.include.keys(
+                'id', 'title', 'content', 'author');
             });
+            resBlogPost = res.body.blogPosts[0];
+            return BlogPost.findById(resBlogPost.id);
+        })
+        .then(function(blogPost) {
+
+            blogPost.id.should.equal(blogPost.id);
+            blogPost.title.should.equal(blogPost.title);
+            blogPost.content.should.equal(blogPost.content);
+            blogPost.author.should.equal(blogPost.author);
         });
-      });
-      describe('POST endpoint', function() {
-        // strategy: make a POST request with data,
-        // then prove that the post we get back has
-        // right keys, and that `id` is there (which means
-        // the data was inserted into db)
+    });
+});
+    describe('POST endpoint', function() {
+    // strategy: make a POST request with data,
+    // then prove that the post we get back has
+    // right keys, and that `id` is there (which means
+    // the data was inserted into db)
         it('should add a new post', function() {
-    
-          const newBlogPost = generateBlogPostData();
-    
-          return chai.request(app)
+
+            const newBlogPost = generateBlogPostData();
+
+            return chai.request(app)
             .post('/posts')
             .send(newBlogPost)
             .then(function(res) {
-              res.should.have.status(201);
-              res.should.be.json;
-              res.body.should.be.a('object');
-              res.body.should.include.keys(
+                res.should.have.status(201);
+                res.should.be.json;
+                res.body.should.be.a('object');
+                res.body.should.include.keys(
                 'id', 'title', 'content', 'author');
-              res.body.title.should.equal(newBlogPost.title);
-              // cause Mongo should have created id on insertion
-              res.body.id.should.not.be.null;
-              res.body.content.should.equal(newBlogPost.content);
-              return BlogPost.findById(res.body.id);
+                res.body.title.should.equal(newBlogPost.title);
+                // cause Mongo should have created id on insertion
+                res.body.id.should.not.be.null;
+                res.body.content.should.equal(newBlogPost.content);
+                return BlogPost.findById(res.body.id);
             })
             .then(function(blogPost) {
-              blogPost.title.should.equal(newBlogPost.title);
-              blogPost.content.should.equal(newBlogPost.content);
-              blogPost.author.firstName.should.equal(newBlogPost.author.firstName);
-              blogPost.author.lastName.should.equal(newBlogPost.author.lastName);
+                blogPost.title.should.equal(newBlogPost.title);
+                blogPost.content.should.equal(newBlogPost.content);
+                blogPost.author.firstName.should.equal(newBlogPost.author.firstName);
+                blogPost.author.lastName.should.equal(newBlogPost.author.lastName);
             });
         });
-      });
-
+    });
+    describe('PUT endpoint', function() {
+    
+        // strategy:
+        //  1. Get an existing post from db
+        //  2. Make a PUT request to update that post
+        //  3. Prove post returned by request contains data we sent
+        //  4. Prove post in db is correctly updated
+        it('should update fields you send over', function() {
+            const updateData = {
+            title: 'fofofofofofofof',
+            content: 'futuristic funk'
+            };
+    
+            return BlogPost
+            .findOne()
+            .then(function(blogPost) {
+                updateData.id = blogPost.id;
+    
+                // make request then inspect it to make sure it reflects
+                // data we sent
+                return chai.request(app)
+                .put(`/posts/${blogPost.id}`)
+                .send(updateData);
+            })
+            .then(function(res) {
+                res.should.have.status(200);
+    
+                return BlogPost.findById(updateData.id);
+            })
+            .then(function(blogPost) {
+                blogPost.title.should.equal(updateData.title);
+                blogPost.content.should.equal(updateData.content);
+            });
+        });
+    });
+    describe('DELETE endpoint', function() {
+        // strategy:
+        //  1. get a post
+        //  2. make a DELETE request for that post's id
+        //  3. assert that response has right status code
+        //  4. prove that post with the id doesn't exist in db anymore
+        it('delete a post by id', function() {
+    
+            let blogPost;
+    
+            return BlogPost
+            .findOne()
+            .then(function(_blogPost) {
+                blogPost = _blogPost;
+                return chai.request(app).delete(`/posts/${blogPost.id}`);
+            })
+            .then(function(res) {
+                res.should.have.status(204);
+                return BlogPost.findById(blogPost.id);
+            })
+            .then(function(_blogPost) {
+                // when a variable's value is null, chaining `should`
+                // doesn't work. so `_blogPost.should.be.null` would raise
+                // an error. `should.be.null(_restaurant)` is how we can
+                // make assertions about a null value.
+                should.not.exist(_blogPost);
+            });
+        });
+    });
 });
